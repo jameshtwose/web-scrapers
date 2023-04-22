@@ -1,0 +1,6 @@
+pandas
+openpyxl
+xlrd
+requests
+sqlalchemy
+psycopg2
