@@ -5,17 +5,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sqlalchemy import create_engine
 from dotenv import load_dotenv, find_dotenv
+from utils import convert_numeric, label_wins_losses_draws
 
 _ = load_dotenv(find_dotenv())
 
-
-# %%
-def convert_numeric(col):
-    try:
-        return col.astype(float)
-    except (TypeError, ValueError):
-        return col
-
+# set the style of the plots
+if "jms_style_sheet" in plt.style.available:
+    plt.style.use("jms_style_sheet")
 
 # %%
 engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
@@ -40,34 +36,43 @@ _ = plt.title("Missing Values by Date")
 df[columns_of_interest].info()
 # %%
 df[columns_of_interest].head()
+
 # %%
-# TODO: this is currently not correct
-# Need to make a win/loss/draw column that is based on a set of
+# make a win/loss/draw column that is based on a set of
 # if/else statements
 team_of_interest = "Portsmouth"
+time_interval = "year"
 plot_df = (
     df[columns_of_interest]
+    .loc[lambda x: (x["HomeTeam"] == team_of_interest) | (x["AwayTeam"] == team_of_interest), :]
     .assign(**{
         # "week": lambda x: x["Date"].dt.isocalendar().week,
-               "month": lambda x: x["Date"].dt.month,
-               "year": lambda x: x["Date"].dt.year,
-               "year-month": lambda x: x["year"].astype(str) + "-" + x["month"].astype(str),
+        "month": lambda x: x["Date"].dt.month,
+        "year": lambda x: x["Date"].dt.year,
+        "year-month": lambda x: x["year"].astype(str) + "-" + x["month"].astype(str),
+        "win_loss_draw": lambda x: x.apply(lambda y: label_wins_losses_draws(y, team_of_interest), axis=1),
             #    "year-week": lambda x: x["year"].astype(str) + "-" + x["week"].astype(str)
-               })
-    .drop(["month", "Date", "FTAG", "FTHG"], axis=1)
-    .loc[lambda x: (x["HomeTeam"] == team_of_interest) | (x["AwayTeam"] == team_of_interest), :]
-    .melt(id_vars=["year", "FTR"])
+            })
+    .drop(["month", "Date", "FTAG", "FTHG", "FTR"], axis=1)
+    .melt(id_vars=[time_interval, "win_loss_draw"])
     .loc[lambda x: x["value"] == team_of_interest, :]
-    .groupby(["year", "FTR"])
+    .groupby([time_interval, "win_loss_draw"])
     .count()
-    .rename(columns={"value": "win_loss_draw"})
+    .rename(columns={"value": "amount"})
     .drop("variable", axis=1)
     .reset_index()
 )
 plot_df.shape
 # %%
-_ = sns.lineplot(data=plot_df, x="year", y="win_loss_draw", hue="FTR")
+_ = sns.lineplot(data=plot_df, x=time_interval,
+                 y="amount", hue="win_loss_draw")
 _ = plt.title(f"Win/Loss/Draw for {team_of_interest}")
 # %%
-plot_df
+diff_df = plot_df.groupby(time_interval).apply(
+    lambda x: x[x["win_loss_draw"] == "win"]["amount"].iloc[0] - x[x["win_loss_draw"] == "loss"]["amount"].iloc[0]).reset_index().rename(columns={0: "diff"})
+# %%
+_ = sns.lineplot(data=diff_df, x=time_interval,
+                 y="diff")
+_ = plt.title(f"Win/Loss difference for {team_of_interest}")
+
 # %%
