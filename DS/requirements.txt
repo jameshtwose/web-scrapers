@@ -1,0 +1,5 @@
+pandas
+pyspark
+seaborn
+python-dotenv
+ipykernel
