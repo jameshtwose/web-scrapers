@@ -1,0 +1,27 @@
+name: run ./job_scrape/freelance_nl.py
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+      - name: Ensure browsers are installed
+        run: python -m playwright install --with-deps
+      - name: execute py script # run the freelance_nl.py to scrape the data
+        env:
+          FREELANCE_NL_USERNAME: ${{ secrets.FREELANCE_NL_USERNAME }}
+          FREELANCE_NL_PASSWORD: ${{ secrets.FREELANCE_NL_PASSWORD }}
+        run: |
+          cd ./job_scrape
+          python freelance_nl.py
