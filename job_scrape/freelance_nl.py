@@ -54,6 +54,8 @@ with sync_playwright() as p:
         )
         all_df = pd.concat([all_df, df])
 
+    print(all_df.head())
+    
     all_df.to_csv(
         f"freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False
     )
