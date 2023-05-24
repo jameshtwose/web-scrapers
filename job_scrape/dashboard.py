@@ -1,6 +1,6 @@
 # a streamlit dashboard to display the results of the job scrape
-# to run the dashboard locally, run the following command from the job_scrape directory:
-# streamlit run dashboard.py in the terminal
+# to run the dashboard locally, run the following command from the root directory:
+# streamlit run ./job_scrape/dashboard.py
 
 import streamlit as st
 import pandas as pd
@@ -29,7 +29,7 @@ def load_data():
         "description",
     ]
     return (
-        pd.concat([pd.read_csv(x) for x in glob("freelance_nl_data/*")])
+        pd.concat([pd.read_csv(x) for x in glob("./job_scrape/freelance_nl_data/*")])
         .loc[:, column_list]
         .assign(
             **{
