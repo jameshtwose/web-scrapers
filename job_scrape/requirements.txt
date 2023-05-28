@@ -4,3 +4,5 @@ pandas
 python-dotenv>=0.20.0
 streamlit>=1.22.0
 plotly>=5.14.1
+sqlalchemy
+psycopg2

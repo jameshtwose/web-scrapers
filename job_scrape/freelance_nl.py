@@ -4,6 +4,9 @@ import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
 import os
+from sqlalchemy import create_engine
+
+engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
 
 _ = load_dotenv(find_dotenv())
 
@@ -56,6 +59,7 @@ with sync_playwright() as p:
 
     print(all_df.head())
     
-    all_df.to_csv(
-        f"~/Coding/web-scrapers/job_scrape/freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False
-    )
+    # all_df.to_csv(
+    #     f"~/Coding/web-scrapers/job_scrape/freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False
+    # )
+    all_df.to_sql("freelance_nl_data", engine, if_exists="append", index=False)
