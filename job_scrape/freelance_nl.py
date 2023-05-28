@@ -57,5 +57,5 @@ with sync_playwright() as p:
     print(all_df.head())
     
     all_df.to_csv(
-        f"freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False
+        f"~/Coding/web-scrapers/job_scrape/freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False
     )
