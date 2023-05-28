@@ -99,7 +99,7 @@ st.title("Freelance Job Scrape Dashboard")
 st.markdown(
     f"""
     <h2 style="color: rgb(232, 192, 3); font-size: 20px;">
-        Amount of Jobs Scaped = {df.shape[0]}
+        Amount of Jobs Scraped = {df.shape[0]}
     </h2>
     """,
     unsafe_allow_html=True,
