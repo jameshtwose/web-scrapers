@@ -6,6 +6,13 @@ import streamlit as st
 import pandas as pd
 from glob import glob
 import plotly.express as px
+from dotenv import load_dotenv, find_dotenv
+import os
+from sqlalchemy import create_engine
+
+_ = load_dotenv(find_dotenv())
+
+engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
 
 # configure the page
 st.set_page_config(page_title="Freelance Jobs Dashboard", page_icon=":sparkles:", layout="wide")
@@ -29,8 +36,10 @@ def load_data():
         "description",
     ]
     return (
-        pd.concat([pd.read_csv(x) for x in glob("./job_scrape/freelance_nl_data/*")])
+        # pd.concat([pd.read_csv(x) for x in glob("./job_scrape/freelance_nl_data/*")])
+        pd.read_sql("SELECT * FROM freelance_nl_data", engine)
         .loc[:, column_list]
+        .drop_duplicates()
         .assign(
             **{
                 "Publicatiedatum": lambda x: pd.to_datetime(
@@ -85,6 +94,16 @@ if chosen_jobs == []:
 
 # main page
 st.title("Freelance Job Scrape Dashboard")
+
+# amount of jobs scraped
+st.markdown(
+    f"""
+    <h2 style="color: rgb(232, 192, 3); font-size: 20px;">
+        Amount of Jobs Scaped = {df.shape[0]}
+    </h2>
+    """,
+    unsafe_allow_html=True,
+)
 
 # display all the data
 st.header("All Scraped Data")

@@ -17,5 +17,5 @@ df.head()
 # %%
 # df.to_sql("freelance_nl_data", engine, if_exists="append", index=False)
 # %%
-# pd.read_sql("SELECT * FROM freelance_nl_data", engine)
+pd.read_sql("SELECT * FROM freelance_nl_data", engine)
 # %%

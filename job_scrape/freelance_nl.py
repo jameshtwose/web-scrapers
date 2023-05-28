@@ -6,9 +6,9 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from sqlalchemy import create_engine
 
-engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
-
 _ = load_dotenv(find_dotenv())
+
+engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
 
 with sync_playwright() as p:
     # browser = p.chromium.launch(headless=False, slow_mo=1000)
