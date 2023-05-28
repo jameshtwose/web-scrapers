@@ -2,8 +2,8 @@ version: '3.10'
 
 services:
   app:
-    container_name: finance-nl-c
-    image: finance-nl-i
+    container_name: freelance-nl-c
+    image: freelance-nl-i
     build: 
       context: .
       dockerfile: Dockerfile

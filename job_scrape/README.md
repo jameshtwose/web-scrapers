@@ -9,4 +9,4 @@ This is a dashboard for the job scrape project. It is built using [Streamlit](ht
 ### Build instructions (docker)
 - Install [Docker](https://docs.docker.com/install/)
 - `docker compose --env-file=./.env build`
-- `docker run -d -p 8501:8501 finance-nl-i`
+- `docker run -d -p 8501:8501 freelance-nl-i`
