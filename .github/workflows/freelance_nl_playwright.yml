@@ -21,6 +21,7 @@ jobs:
         env:
           FREELANCE_NL_USERNAME: ${{ secrets.FREELANCE_NL_USERNAME }}
           FREELANCE_NL_PASSWORD: ${{ secrets.FREELANCE_NL_PASSWORD }}
+          SPORTS_SCRAPER_POSTGRES_URL: ${{ secrets.SPORTS_SCRAPER_POSTGRES_URL }}
         run: |
           cd ./job_scrape
           python freelance_nl.py
