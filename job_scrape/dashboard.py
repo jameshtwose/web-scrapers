@@ -15,7 +15,9 @@ _ = load_dotenv(find_dotenv())
 engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
 
 # configure the page
-st.set_page_config(page_title="Freelance Jobs Dashboard", page_icon=":sparkles:", layout="wide")
+st.set_page_config(
+    page_title="Freelance Jobs Dashboard", page_icon=":sparkles:", layout="wide"
+)
 
 single_color_palette = ["#8f0fd4"]
 
@@ -39,13 +41,26 @@ def load_data():
         # pd.concat([pd.read_csv(x) for x in glob("./job_scrape/freelance_nl_data/*")])
         pd.read_sql("SELECT * FROM freelance_nl_data", engine)
         .loc[:, column_list]
-        .drop_duplicates(subset=column_list[0:-3], keep="last")
+        .drop_duplicates(
+            subset=[
+                "job_title",
+                "Publicatiedatum",
+                "Startdatum",
+                "Op locatie",
+                "Looptijd",
+                "Aantal uur",
+                "Tarief",
+            ],
+            keep="last",
+        )
         .assign(
             **{
                 "Publicatiedatum": lambda x: pd.to_datetime(
                     x["Publicatiedatum"], format="%d-%m-%Y %H:%M"
                 ),
-                "Reacties": lambda x: x["Reacties"].str.split(" ", expand=True)[0].astype(int),
+                "Reacties": lambda x: x["Reacties"]
+                .str.split(" ", expand=True)[0]
+                .astype(int),
                 "Geplaatst door": lambda x: x["Geplaatst door"].fillna("Onbekend"),
             }
         )
@@ -68,7 +83,9 @@ chosen_jobs = st.sidebar.multiselect(
     "Select a job title",
     df["job_title"].unique(),
     key="job_title",
-    default=df.loc[lambda x: x["job_title"].str.contains("Data|data"), "job_title"].unique(),
+    default=df.loc[
+        lambda x: x["job_title"].str.contains("Data|data"), "job_title"
+    ].unique(),
     help="Select a job title to display the description.",
 )
 st.sidebar.markdown(
