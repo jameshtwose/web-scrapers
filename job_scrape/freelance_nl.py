@@ -58,6 +58,9 @@ with sync_playwright() as p:
         all_df = pd.concat([all_df, df])
 
     print(all_df.head())
+    print(all_df.shape)
+    print(all_df["job_title"].value_counts())
+    print(all_df["Geplaatst door"].value_counts())
     
     # all_df.to_csv(
     #     f"~/Coding/web-scrapers/job_scrape/freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False

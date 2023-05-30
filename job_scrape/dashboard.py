@@ -20,7 +20,7 @@ st.set_page_config(page_title="Freelance Jobs Dashboard", page_icon=":sparkles:"
 single_color_palette = ["#8f0fd4"]
 
 
-@st.cache_data(ttl=60 * 60 * 24)
+@st.cache_data(ttl=3600)
 def load_data():
     column_list = [
         "job_title",
@@ -39,7 +39,7 @@ def load_data():
         # pd.concat([pd.read_csv(x) for x in glob("./job_scrape/freelance_nl_data/*")])
         pd.read_sql("SELECT * FROM freelance_nl_data", engine)
         .loc[:, column_list]
-        .drop_duplicates()
+        .drop_duplicates(subset=column_list[0:-3], keep="last")
         .assign(
             **{
                 "Publicatiedatum": lambda x: pd.to_datetime(
