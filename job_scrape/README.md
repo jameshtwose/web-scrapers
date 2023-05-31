@@ -3,6 +3,7 @@ This is a dashboard for the job scrape project. It is built using [Streamlit](ht
 
 ### Build instructions (python) 
 - Install [Python](https://www.python.org/downloads/)
+- `cd job_scrape`
 - `pip install -r requirements.txt`
 - `streamlit run dashboard.py`
 

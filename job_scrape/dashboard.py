@@ -9,6 +9,7 @@ import plotly.express as px
 from dotenv import load_dotenv, find_dotenv
 import os
 from sqlalchemy import create_engine
+from datetime import datetime
 
 _ = load_dotenv(find_dotenv())
 
@@ -21,6 +22,10 @@ st.set_page_config(
 
 single_color_palette = ["#8f0fd4"]
 
+# @st.cache_data()
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
 
 @st.cache_data(ttl=3600)
 def load_data():
@@ -79,8 +84,16 @@ st.sidebar.markdown(
     This dashboard displays the results of the job scrape.
     """
 )
+date_range = st.sidebar.date_input(
+    "Select a date range",
+    value=[df["Publicatiedatum"].dt.date.min(), df["Publicatiedatum"].dt.date.max()],
+    min_value=df["Publicatiedatum"].dt.date.min(),
+    max_value=df["Publicatiedatum"].dt.date.max(),
+    key="date",
+    help="Select a date range to display the jobs posted between those dates.",
+)
 chosen_jobs = st.sidebar.multiselect(
-    "Select a job title",
+    "Select a/ some job title(s)",
     df["job_title"].unique(),
     key="job_title",
     default=df.loc[
@@ -143,9 +156,24 @@ st.write(
 )
 
 # display the data for the selected job titles
-selected_df = df.loc[lambda x: x["job_title"].isin(chosen_jobs), :]
+if len(date_range) == 2:
+    selected_df = df.loc[lambda x: x["job_title"].isin(chosen_jobs), :].loc[
+        lambda x: x["Publicatiedatum"].dt.date.between(date_range[0], date_range[1]), :
+    ]
+else:
+    selected_df = df.loc[lambda x: x["job_title"].isin(chosen_jobs), :]
+
 st.header("Selected Job Title(s)")
 st.write(selected_df)
+
+# download the selected data
+csv = convert_df(selected_df)
+st.download_button(
+    label="Download selected data as CSV",
+    data=csv,
+    file_name=f"freelance_jobs_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv",
+    mime='text/csv',
+)
 
 # plot the geplaats door value counts for the selected job titles
 # st.write(
@@ -166,10 +194,32 @@ st.markdown(
 # plot the looptijd value counts for the selected job titles
 st.write(
     px.bar(
-        selected_df["Looptijd"].value_counts().reset_index(),
+        selected_df["Looptijd"].value_counts().reset_index().sort_values(by="count", ascending=True),
         x="count",
         y="Looptijd",
         title="Looptijd Value Counts for the Selected Job Titles",
+        color_discrete_sequence=single_color_palette,
+    )
+)
+
+# plot the amount of jobs per job title
+st.write(
+    px.bar(
+        selected_df["job_title"].value_counts().reset_index().sort_values(by="count", ascending=True),
+        x="count",
+        y="job_title",
+        title="Amount of Jobs per Job Title of Selected Job Titles",
+        color_discrete_sequence=single_color_palette,
+    )
+)
+
+# plot the amount of jobs posted per person
+st.write(
+    px.bar(
+        selected_df["Geplaatst door"].value_counts().reset_index().sort_values(by="count", ascending=True),
+        x="count",
+        y="Geplaatst door",
+        title="Amount of Jobs Posted per Person of Selected Job Titles",
         color_discrete_sequence=single_color_palette,
     )
 )
@@ -188,7 +238,7 @@ st.write(
 # plot the Aantal uur value counts for the selected job titles
 st.write(
     px.bar(
-        selected_df["Aantal uur"].value_counts().reset_index(),
+        selected_df["Aantal uur"].value_counts().reset_index().sort_values(by="count", ascending=True),
         x="count",
         y="Aantal uur",
         title="Aantal uur Value Counts for the Selected Job Titles",
@@ -199,7 +249,7 @@ st.write(
 # plot the Tarief value counts for the selected job titles
 st.write(
     px.bar(
-        selected_df["Tarief"].value_counts().reset_index(),
+        selected_df["Tarief"].value_counts().reset_index().sort_values(by="count", ascending=True),
         x="count",
         y="Tarief",
         title="Tarief Value Counts for the Selected Job Titles",
@@ -210,7 +260,7 @@ st.write(
 # plot the Contract value counts for the selected job titles
 st.write(
     px.bar(
-        selected_df["Contract"].value_counts().reset_index(),
+        selected_df["Contract"].value_counts().reset_index().sort_values(by="count", ascending=True),
         x="count",
         y="Contract",
         title="Contract Value Counts for the Selected Job Titles",
