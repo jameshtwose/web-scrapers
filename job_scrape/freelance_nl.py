@@ -52,7 +52,8 @@ with sync_playwright() as p:
             **{
                 "description": new_page_soup.find("div", class_="htmldescription")
                 .text.replace("\n", " ")
-                .replace("  ", "")
+                .replace("  ", ""),
+                "url": f"https://mijn.freelance.nl{url_end}",
             }
         )
         all_df = pd.concat([all_df, df])
