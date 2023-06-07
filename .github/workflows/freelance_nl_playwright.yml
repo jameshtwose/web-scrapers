@@ -4,7 +4,7 @@ name: run ./job_scrape/freelance_nl.py
 
 on:
   schedule:
-    - cron: '0 9,15 * * *'
+    - cron: '0 7,13 * * *'
 
 jobs:
   build:
