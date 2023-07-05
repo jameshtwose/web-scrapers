@@ -1,13 +1,19 @@
+import os
 import asyncio
 from pyppeteer import launch
 import pandas as pd
 from datetime import datetime
+from dotenv import load_dotenv, find_dotenv
+from sqlalchemy import create_engine
 
+_ = load_dotenv(find_dotenv())
+
+engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
 
 async def scrape():
     browser = await launch()
     page = await browser.newPage()
-    await page.goto("https://www.quades.com/nl/vacatures/")
+    await page.goto("https://www.quades.com/nl/vacatures/?_sf_s=python")
 
     page_select = await page.querySelector("#posts-container")
     page_content = await page_select.getProperty("innerHTML")
@@ -25,11 +31,16 @@ async def scrape():
 
         df = pd.concat([df, pd.DataFrame([x for x in response.split("\n") if x != ""] + [url]).T])
 
-    (
-        df.rename(columns={0: "title", 1: "date", 2: "meta_tags", 3: "description", 4: "url"})
+    all_df = (
+        df.rename(columns={0: "job_title", 1: "Publicatiedatum", 2: "meta_tags", 3: "description", 4: "url"})
         .reset_index(drop=True)
+        .assign(**{"Publicatiedatum": lambda x: pd.to_datetime(x["Publicatiedatum"], format="%d-%m-%Y").dt.strftime("%d-%m-%Y %H:%M")})
+        # .loc[:, ["job_title", "Publicatiedatum", "description", "url"]]
         .to_csv(f"data/quades_{datetime.today().strftime('%Y-%m-%d')}.csv")
     )
+    
+    # with engine.connect() as connection:
+    #     all_df.to_sql("freelance_nl_data", con=connection, if_exists="append", index=False)
 
     await browser.close()
 

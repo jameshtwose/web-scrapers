@@ -66,4 +66,5 @@ with sync_playwright() as p:
     # all_df.to_csv(
     #     f"~/Coding/web-scrapers/job_scrape/freelance_nl_data/freelance_nl_{datetime.today().strftime('%Y-%m-%d')}.csv", index=False
     # )
-    all_df.to_sql("freelance_nl_data", engine, if_exists="append", index=False)
+    with engine.connect() as connection:
+        all_df.to_sql("freelance_nl_data", con=connection, if_exists="append", index=False)

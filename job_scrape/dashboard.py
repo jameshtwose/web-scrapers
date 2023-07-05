@@ -88,12 +88,16 @@ def load_data():
                 ),
                 "Reacties": lambda x: x["Reacties"]
                 .str.split(" ", expand=True)[0]
+                # .fillna(0)
                 .astype(int),
                 "Geplaatst door": lambda x: x["Geplaatst door"].fillna("Onbekend"),
                 "minimum_aantal_uur": lambda x: x["Aantal uur"]
                 .str.split("-", expand=True)[0]
+                # .fillna(40)
                 .astype(int),
-                "looptijd_in_months": lambda x: x["Looptijd"].apply(
+                "looptijd_in_months": lambda x: x["Looptijd"]
+                # .fillna("12 maanden")
+                .apply(
                     convert_looptijd_to_number
                 ),
             }
