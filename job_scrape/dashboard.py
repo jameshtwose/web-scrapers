@@ -51,7 +51,7 @@ def convert_df(df):
     return df.to_csv().encode("utf-8")
 
 
-# @st.cache_data(ttl=60)
+@st.cache_data(ttl=60)
 def load_data():
     column_list = [
         "job_title",
