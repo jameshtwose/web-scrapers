@@ -16,6 +16,7 @@ with sync_playwright() as p:
     page = browser.new_page()
     initial_url = "https://mijn.freelance.nl/"
     page.goto(initial_url)
+    page.click("body > div.cookiefirst-root.notranslate > div.cf1e63.cf0e2J.cfM1eQ > div > div.cfAdwL.cf7ddU > div:nth-child(2) > div.cf3Tgk.cf2pAE.cfAdwL.cf1IKf > div:nth-child(2) > button")
     page.fill(
         "#login > div > div > div.content > div > form > ul > li.email.required > div > div > input[type=email]",
         os.getenv("FREELANCE_NL_USERNAME"),
