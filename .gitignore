@@ -167,3 +167,5 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+hipsy.sqlite
+hipsy.csv

@@ -10,6 +10,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from sqlalchemy import create_engine
 from datetime import datetime
+import numpy as np
 
 _ = load_dotenv(find_dotenv())
 
@@ -21,6 +22,7 @@ st.set_page_config(
 )
 
 single_color_palette = ["#8f0fd4"]
+double_color_palette = ["#8f0fd4", "#E8C003"]
 
 
 def convert_looptijd_to_number(x):
@@ -86,19 +88,22 @@ def load_data():
                 "Publicatiedatum": lambda x: pd.to_datetime(
                     x["Publicatiedatum"], format="%d-%m-%Y %H:%M"
                 ),
-                "Reacties": lambda x: x["Reacties"]
-                .str.split(" ", expand=True)[0]
+                "Reacties": lambda x: x["Reacties"].str.split(" ", expand=True)[0]
+                # .fillna(0)
                 .astype(int),
                 "Geplaatst door": lambda x: x["Geplaatst door"].fillna("Onbekend"),
-                "minimum_aantal_uur": lambda x: x["Aantal uur"]
-                .str.split("-", expand=True)[0]
+                "minimum_aantal_uur": lambda x: x["Aantal uur"].str.split(
+                    "-", expand=True
+                )[0]
+                # .fillna(40)
                 .astype(int),
-                "looptijd_in_months": lambda x: x["Looptijd"].apply(
-                    convert_looptijd_to_number
-                ),
+                "looptijd_in_months": lambda x: x["Looptijd"]
+                # .fillna("12 maanden")
+                .apply(convert_looptijd_to_number),
             }
         )
         .sort_values("Publicatiedatum", ascending=False)
+        .dropna(subset=["Publicatiedatum"])
         .reset_index(drop=True)
     )
 
@@ -230,12 +235,24 @@ if len(date_range) == 2:
         .loc[lambda x: x["minimum_aantal_uur"] >= minimum_aantal_uur, :]
         .loc[lambda x: x["looptijd_in_months"] >= looptijd_in_months, :]
         .loc[lambda x: x["Op locatie"].isin(location_list), :]
-        .loc[lambda x: x["description"].str.contains(keyword_in_description, case=False), :]
+        .loc[
+            lambda x: x["description"].str.contains(keyword_in_description, case=False),
+            :,
+        ]
     )
 else:
     selected_df = df.loc[lambda x: x["job_title"].isin(chosen_jobs), :]
 
 st.header("Selected Job Title(s)")
+# amount of selected jobs
+st.markdown(
+    f"""
+    <h2 style="color: rgb(232, 192, 3); font-size: 20px;">
+        Amount of Selected Jobs = {selected_df.shape[0]}
+    </h2>
+    """,
+    unsafe_allow_html=True,
+)
 st.write(selected_df)
 
 # download the selected data
@@ -341,6 +358,43 @@ st.write(
         y="Tarief",
         title="Tarief Value Counts for the Selected Job Titles",
         color_discrete_sequence=single_color_palette,
+    )
+)
+
+def convert_to_float_if_possible(x):
+    try:
+        return float(x)
+    except:
+        return np.nan
+
+plot_df = (
+    selected_df
+    .loc[:, ["Tarief"]]
+    .assign(
+        **{
+            "Lower Tarief": lambda x: x["Tarief"].str.extract("(\d+)", expand=True)[0].astype(float),
+        }
+    )
+    .dropna()
+    .assign(
+        **{
+            "Upper Tarief": lambda x: x["Tarief"].str.split(" ", expand=True)[2].apply(convert_to_float_if_possible),
+        }
+    )
+    .loc[:, ["Lower Tarief", "Upper Tarief"]]
+    .melt()
+)
+
+# plot the density plot of the upper and lower tarief
+st.write(
+    px.histogram(
+        plot_df,
+        x="value",
+        color="variable",
+        marginal="box",
+        title="Density Plot of the Upper and Lower Tarief of the Selected Job Titles",
+        color_discrete_sequence=double_color_palette,
+        nbins=20,
     )
 )
 
