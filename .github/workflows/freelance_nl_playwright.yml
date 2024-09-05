@@ -1,11 +1,11 @@
 name: run ./job_scrape/freelance_nl.py
 
-# on: workflow_dispatch
+on: workflow_dispatch
 
-on:
-  schedule:
-    # - cron: '0 23 * * *'
-    - cron: '0 09,15 * * *'
+# on:
+#   schedule:
+#     # - cron: '0 23 * * *'
+#     - cron: '0 09,15 * * *'
 
 jobs:
   build:
