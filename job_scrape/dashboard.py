@@ -43,6 +43,19 @@ def convert_looptijd_to_number(x):
         return int(x.split(" ")[0]) / 30
     elif "jaar" in x:
         return int(x.split(" ")[0]) * 12
+    
+
+def convert_aantal_uur_to_number(x):
+    """Convert aantal uur to number expressed in hour units.
+
+    Args:
+        x (str): aantal uur string
+
+    Returns:
+        float: aantal uur expressed in hours
+
+    """
+    return [int(s) for s in x.split() if s.isdigit()][0]
 
 
 # @st.cache_data()
@@ -86,17 +99,16 @@ def load_data():
         .assign(
             **{
                 "Publicatiedatum": lambda x: pd.to_datetime(
-                    x["Publicatiedatum"], format="%d-%m-%Y %H:%M"
+                    # 2025-02-24 12:30
+                    x["Publicatiedatum"], format="mixed"
                 ),
                 "Reacties": lambda x: x["Reacties"].str.split(" ", expand=True)[0]
                 # .fillna(0)
                 .astype(int),
                 "Geplaatst door": lambda x: x["Geplaatst door"].fillna("Onbekend"),
-                "minimum_aantal_uur": lambda x: x["Aantal uur"].str.split(
-                    "-", expand=True
-                )[0]
-                # .fillna(40)
-                .astype(int),
+                "minimum_aantal_uur": lambda x: x["Aantal uur"].apply(
+                    convert_aantal_uur_to_number
+                ),
                 "looptijd_in_months": lambda x: x["Looptijd"]
                 # .fillna("12 maanden")
                 .apply(convert_looptijd_to_number),
