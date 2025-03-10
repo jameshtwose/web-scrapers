@@ -1,11 +1,14 @@
 name: run ./job_scrape/freelance_nl.py
 
-# on: workflow_dispatch
+on: workflow_dispatch
 
-on:
-  schedule:
-    # - cron: '0 23 * * *'
-    - cron: '0 09,15 * * *'
+# on:
+#   schedule:
+#     # - cron: '0 23 * * *'
+#     - cron: '0 09,15 * * *'
+
+env:
+  LANG: "nl_NL.UTF-8"
 
 jobs:
   build:
@@ -29,5 +32,8 @@ jobs:
           SPORTS_SCRAPER_POSTGRES_URL: ${{ secrets.SPORTS_SCRAPER_POSTGRES_URL }}
         run: |
           cd ./job_scrape
+          sudo locale-gen nl_NL.UTF-8
+          export LANG=nl_NL.UTF-8
+          sudo update-locale LANG=nl_NL.UTF-8
           python freelance_nl.py
       - uses: gautamkrishnar/keepalive-workflow@v1 # workflow to stop the auto disable after 60 days
