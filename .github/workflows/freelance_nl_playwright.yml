@@ -16,6 +16,11 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      LANG: "nl_NL.UTF-8"
+      LC_ALL: "nl_NL.UTF-8"
+      LANGUAGE: "nl_NL.UTF-8"
+      LC_CTYPE: "nl_NL.UTF-8"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -35,7 +40,5 @@ jobs:
           SPORTS_SCRAPER_POSTGRES_URL: ${{ secrets.SPORTS_SCRAPER_POSTGRES_URL }}
         run: |
           cd ./job_scrape
-          sudo locale-gen nl_NL.UTF-8
-          sudo update-locale LANG=nl_NL.UTF-8
           python freelance_nl.py
       - uses: gautamkrishnar/keepalive-workflow@v1 # workflow to stop the auto disable after 60 days

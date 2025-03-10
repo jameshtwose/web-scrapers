@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 import locale
 
 # Set the locale to Dutch
-locale.setlocale(locale.LC_TIME, 'nl_NL')
+locale.setlocale(locale.LC_ALL, 'nl_NL')
 
 _ = load_dotenv(find_dotenv())
 
