@@ -33,6 +33,12 @@ jobs:
           pip install -r ./job_scrape/requirements.txt
       - name: Ensure browsers are installed
         run: python -m playwright install --with-deps
+      - name: Generate and configure locale
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales
+          sudo locale-gen nl_NL.UTF-8
+          sudo update-locale LANG=nl_NL.UTF-8
       - name: execute py script # run the freelance_nl.py to scrape the data
         env:
           FREELANCE_NL_USERNAME: ${{ secrets.FREELANCE_NL_USERNAME }}
