@@ -27,7 +27,7 @@ def convert_str_to_dt(s):
     }
     
     for dutch, english in month_map.items():
-        s = s.replace(dutch, english)
+        s = s.lower().replace(dutch, english)
     
     try:
         # 24 feb 2025 15:32
