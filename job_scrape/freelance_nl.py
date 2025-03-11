@@ -5,16 +5,30 @@ from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
 import os
 from sqlalchemy import create_engine
-import locale
-
-# Set the locale to Dutch
-locale.setlocale(locale.LC_ALL, 'nl_NL')
 
 _ = load_dotenv(find_dotenv())
 
 engine = create_engine(os.getenv("SPORTS_SCRAPER_POSTGRES_URL"))
 
 def convert_str_to_dt(s):
+    month_map = {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mrt": "Mar",
+        "apr": "Apr",
+        "mei": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "okt": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+    }
+    
+    for dutch, english in month_map.items():
+        s = s.replace(dutch, english)
+    
     try:
         # 24 feb 2025 15:32
         if ":" in s:
@@ -22,8 +36,8 @@ def convert_str_to_dt(s):
         else:
             # 10 mrt 2025
             return datetime.strptime(s, "%d %b %Y").strftime("%Y-%m-%d")
-    except:
-        print(f"Error converting {s}")
+    except Exception as e:
+        print(f"Error converting {s}: {e}")
         return s
 
 with sync_playwright() as p:

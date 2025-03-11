@@ -7,20 +7,9 @@ on: workflow_dispatch
 #     # - cron: '0 23 * * *'
 #     - cron: '0 09,15 * * *'
 
-env:
-  LANG: "nl_NL.UTF-8"
-  LC_ALL: "nl_NL.UTF-8"
-  LANGUAGE: "nl_NL.UTF-8"
-  LC_CTYPE: "nl_NL.UTF-8"
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      LANG: "nl_NL.UTF-8"
-      LC_ALL: "nl_NL.UTF-8"
-      LANGUAGE: "nl_NL.UTF-8"
-      LC_CTYPE: "nl_NL.UTF-8"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -33,14 +22,6 @@ jobs:
           pip install -r ./job_scrape/requirements.txt
       - name: Ensure browsers are installed
         run: python -m playwright install --with-deps
-      - name: Generate and configure locale
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y locales
-          sudo locale-gen nl_NL.UTF-8
-          sudo update-locale LANG=nl_NL.UTF-8
-      - name: Verify locale settings
-        run: locale
       - name: execute py script # run the freelance_nl.py to scrape the data
         env:
           FREELANCE_NL_USERNAME: ${{ secrets.FREELANCE_NL_USERNAME }}
