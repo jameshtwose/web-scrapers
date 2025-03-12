@@ -32,6 +32,8 @@ def convert_str_to_dt(s):
     try:
         # 24 feb 2025 15:32
         if ":" in s:
+            if "," in s:
+                return datetime.strptime(s, "%d %b %Y, %H:%M").strftime("%Y-%m-%d %H:%M")
             return datetime.strptime(s, "%d %b %Y %H:%M").strftime("%Y-%m-%d %H:%M")
         else:
             # 10 mrt 2025
@@ -60,10 +62,11 @@ with sync_playwright() as p:
     )
     page.click("body > main > div > div.w-full.lg\:rounded-2xl.lg\:bg-white.lg\:p-10.lg\:shadow-sm > div > form > div:nth-child(5) > button")
     page.goto("https://mijn.freelance.nl/opdracht-vinden/zoeken")
-    page.fill(
-        "body > div.flex.pt-14.lg\:h-full.lg\:pb-0.pb-14 > div > main > header > div.grid.gap-4 > div.grid.gap-2 > div > ul > li > input",
-        "python",
-    )
+    page.get_by_placeholder("Vul hier een functietitel of relevante trefwoorden in. Gebruik een komma of enter om woorden te scheiden.").fill("python")
+    # page.fill(
+    #     "body > div.flex.pt-14.lg\:h-full.lg\:pb-0.pb-14 > div > main > header > div.grid.gap-4 > div.grid.gap-2 > div > ul > li > input",
+    #     "python",
+    # )
     page.keyboard.press("Enter")
     page.wait_for_timeout(5000)
     html = page.inner_html("body > div.flex.pt-14.lg\:h-full.lg\:pb-0.pb-14 > div > main > section.lg\:px-10.lg\:pt-6 > div.grid.min-h-96.content-start")
@@ -92,7 +95,7 @@ with sync_playwright() as p:
                 "Looptijd": new_page_soup.find_all('dd')[4].text.strip(),
                 "Aantal uur": new_page_soup.find_all('dd')[5].text.strip(),
                 "Tarief": new_page_soup.find_all('dd')[6].text.strip(),
-                "Contract": new_page_soup.find_all('dd')[7].text.strip(),
+                "Contract": new_page_soup.find_all('dd')[7].text.strip() if len(new_page_soup.find_all('dd')) > 7 else None,
                 "Eindklant": new_page_soup.find_all('dd')[8].text.strip() if len(new_page_soup.find_all('dd')) > 8 else None,
                 "description": new_page_soup.find(class_='prose').text.strip(),
                 "Geplaatst door": new_page_soup.find('strong').text.strip(),
