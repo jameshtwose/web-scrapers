@@ -55,7 +55,10 @@ def convert_aantal_uur_to_number(x):
         float: aantal uur expressed in hours
 
     """
-    return [int(s) for s in x.split() if s.isdigit()][0]
+    try:
+        return [int(s) for s in x.split() if s.isdigit()][0]
+    except:
+        return None
 
 
 # @st.cache_data()
