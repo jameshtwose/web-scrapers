@@ -1,7 +1,5 @@
 name: run ./job_scrape/freelance_nl.py
 
-# on: workflow_dispatch
-
 on:
   workflow_dispatch:
   schedule:
@@ -30,4 +28,3 @@ jobs:
         run: |
           cd ./job_scrape
           python freelance_nl.py
-      - uses: gautamkrishnar/keepalive-workflow@v1 # workflow to stop the auto disable after 60 days
